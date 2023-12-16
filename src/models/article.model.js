@@ -8,6 +8,7 @@ const articleSchema = new mongoose.Schema({
     category: { type: String, enum: ['sport', 'games', 'history'], required: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 const Article = mongoose.model('Article', articleSchema);

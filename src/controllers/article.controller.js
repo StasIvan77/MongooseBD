@@ -31,7 +31,7 @@ export const getArticleById = async (req, res, next) => {
         path: 'owner',
         select: 'fullName email age',
       },
-      select: 'title subtitle createdAt owner',
+      select: 'title subtitle createdAt owner likes',
     });
 
     res.json(articles);
@@ -140,3 +140,41 @@ export const deleteArticleById = async (req, res, next) => {
     next(err);
   }
 }
+
+//example of a command http://localhost:3000/api/v1/articles/657da8d67e22696c2dd22919/like?userId=657b082cf5905533e4ab3bd1
+export const likeArticle = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const userId = req.query.userId;
+
+    // Update the user's likedArticles
+    console.log("Id of an user", userId);
+    await User.findByIdAndUpdate(userId, { $addToSet: { likedArticles: id } });
+
+    // Update the article's likes
+    
+    await Article.findByIdAndUpdate(id, { $addToSet: { likes: userId } });
+
+    res.status(200).json({ message: 'Article liked successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const unlikeArticle = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.query.userId;
+
+    // Update the user's likedArticles
+    await User.findByIdAndUpdate(userId, { $pull: { likedArticles: id } });
+
+    // Update the article's likes
+    await Article.findByIdAndUpdate(id, { $pull: { likes: userId } });
+
+    res.status(200).json({ message: 'Article unliked successfully' });
+  } catch (err) {
+    next(err);
+  }
+};

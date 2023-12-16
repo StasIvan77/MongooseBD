@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import logger from 'morgan';
+import { getUserIdMiddleware } from './src/middleware/authMiddleware.js';
+import { getUserByIdWithArticles } from './src/controllers/user.controller.js';
 
 import router from './src/routes/index.js';
 dotenv.config();
@@ -16,6 +18,7 @@ mongoose.connect(process.env.DB_URI, {
 })
 .catch((err) => console.error(err));
 mongoose.set('debug', true);
+app.get('/api/v1/users/:userId', getUserIdMiddleware, getUserByIdWithArticles);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -24,6 +27,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`)
